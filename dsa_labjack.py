@@ -279,7 +279,7 @@ class DsaAntLabjack:
             self.log_msg_q.put((log.INFO, MODULE, msg))
             self.move_time = abs(self.monitor_points['ant_el'] - pos)/ DRIVE_RATE
             self.stop_time = time.time() + TIMEOUT
-            err = 0
+            err = 0.0
             self.switch_brake('off')
             while time.time() < self.stop_time:
                 err = pos - self.monitor_points['ant_el']
@@ -292,11 +292,13 @@ class DsaAntLabjack:
                     self.get_data()
                 else:
                     break
+            self.ctrl_antenna_motor(OFF)
+            self.switch_brake('on')
             if abs(err) > ACQ_WINDOW:
                 msg = "Ant {}: Move timed out".format(self.ant_num)
             else:
                 msg = "Ant {}: Elevation acquired".format(self.ant_num)
-            self.switch_brake('on')
+
             self.log_msg_q.put((log.ERROR, MODULE, msg))
         else:
             if pos == 'up':
